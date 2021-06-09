@@ -1,0 +1,40 @@
+version: '2'
+
+volumes:
+  roundcube_amain:
+  roundcube_dbmain:
+  
+services:
+  roundcube_db:
+    image: mysql:5.7
+    container_name: roundcube_db
+#    restart: unless-stopped
+    volumes:
+      - rounddatadbmain:/var/lib/mysql
+    ports:
+      - 6489:5432
+      - 9856:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=Be6m7OeT46yX
+      - MYSQL_DATABASE=roundcubemail
+
+  roundcubemail:
+    image: roundcube/roundcubemail:latest
+    container_name: roundcubemail
+    restart: unless-stopped
+    depends_on:
+      - roundcube_db
+    links:
+      - roundcube_db
+    volumes:
+      - rounddatamain:/var/www/html
+    ports:
+      - 7514:80
+      - 4125:443
+    environment:
+      - ROUNDCUBEMAIL_DB_TYPE=mysql
+      - ROUNDCUBEMAIL_DB_HOST=roundcube_db
+      - ROUNDCUBEMAIL_DB_PASSWORD=Be6m7OeT46yX
+      - ROUNDCUBEMAIL_SKIN=elastic
+      - ROUNDCUBEMAIL_DEFAULT_HOST=tls://mail.example.org
+      - ROUNDCUBEMAIL_SMTP_SERVER=tls://mail.example.org
